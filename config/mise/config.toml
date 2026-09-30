@@ -1,0 +1,79 @@
+[settings]
+idiomatic_version_file_enable_tools = ["node"]
+
+[tools]
+python = "3.14"
+uv = "latest"
+ruff = "latest"
+
+go = "1.26.2"
+
+rust = "1.94.1"
+
+node = "24"
+bun = "latest"
+deno = "latest"
+pnpm = "latest"
+
+lua = "latest"
+stylua = "latest"
+
+java = "21"
+maven = "latest"
+gradle = "latest"
+
+bat = "latest"
+cmake = "latest"
+delta = "latest"
+dust = "latest"
+eza = "latest"
+fd = "latest"
+fzf = "latest"
+gh = "latest"
+neovim = "latest"
+ripgrep = "latest"
+starship = "latest"
+tlrc = "latest"
+yazi = "latest"
+zoxide = "latest"
+
+[bootstrap.packages]
+"brew:btop" = { version = "latest", os = "macos" }
+"brew:glab" = { version = "latest", os = "macos" }
+"brew-cask:claude-code" = { version = "latest", os = "macos" }
+"brew-cask:ghostty" = { version = "latest", os = "macos" }
+"brew-cask:kitty" = { version = "latest", os = "macos" }
+"brew-cask:homebrew-app" = { version = "latest", os = "macos" }
+
+[bootstrap.macos.dock]
+autohide = true
+show_recents = false
+
+[bootstrap.macos.finder]
+sort_folders_first = true
+show_all_files = false
+show_pathbar = true
+show_status_bar = true
+show_extensions_warning = false
+preferred_view_style = "column"
+
+[bootstrap.macos.keyboard]
+key_repeat = 1
+initial_key_repeat = 15
+press_and_hold = false
+
+[bootstrap.macos.trackpad]
+tap_to_click = true
+
+[bootstrap.macos.defaults]
+"com.apple.finder" = { FXDefaultSearchScope = "SCcf" }
+
+[tasks.install-homebrew]
+description = "Install homebrew onto the system"
+run = """
+  if command -v brew >/dev/null 2>&1; then
+    echo "homebrew already installed at $(brew --prefix)"
+    exit 0
+  fi
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+"""
