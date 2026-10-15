@@ -1,0 +1,74 @@
+#!/usr/bin/env zsh
+
+zplug() {
+  ZPLUGDIR="${ZPLUGDIR:-$HOME/.local/share/zsh}"
+
+  case "$1" in
+  update)
+    for plugin in "$ZPLUGDIR"/*(N-/); do
+      if [[ -d "$plugin/.git" ]]; then
+        local name="${plugin##*/}"
+        echo "Updating $name..."
+        git -C "$plugin" pull --quiet --recurse-submodules &>/dev/null
+        echo "$name update completed"
+      fi
+    done
+    ;;
+  list)
+    echo "Installed plugins"
+    local found=0
+    for plugin in "$ZPLUGDIR"/*(N-/); do
+      if [[ -d "$plugin/.git" ]]; then
+        echo "  - ${plugin##*/} ($plugin)"
+        found=1
+      fi
+    done
+    ((found == 0)) && echo "  (None)"
+    ;;
+  *)
+    local input="$1"
+    [[ -z "$input" ]] && return 1
+
+    local repo="$input"
+    local name="${input##*/}"
+    local dest="${ZPLUGDIR%/}/$name"
+
+    local url
+    if [[ "$input" =~ ^(https?|git|ssh):// ]] || [[ "$input" =~ ^[^/]+@[^/]+: ]]; then
+      url="$input"
+    else
+      url="https://github.com/$repo.git"
+    fi
+
+    if [[ ! -d $dest ]]; then
+      echo "Download plugin $name..."
+
+      local -a clone_cmd=(git clone --quiet --depth 1)
+      if "${clone_cmd[@]}" "$url" "$dest"; then
+        echo "$name download successfully"
+      else
+        local exit_code=$?
+        echo "Clone failed with exit code $exit_code"
+        return "$exit_code"
+      fi
+    fi
+
+    local plugin_entry
+    for entry in "$dest/$name.plugin.zsh" "$dest/$name.zsh"; do
+      if [[ -f "$entry" ]]; then
+        plugin_entry="$entry"
+        break
+      fi
+    done
+
+    if [[ -n "$plugin_entry" && -f "$plugin_entry" ]]; then
+      # shellcheck disable=SC1090
+      source "$plugin_entry"
+    else
+      echo "Warning: Could not find plugin entry file in $dest"
+    fi
+
+    return 0
+    ;;
+  esac
+}
