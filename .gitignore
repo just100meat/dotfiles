@@ -1,3 +1,9 @@
 config/zsh/.zsh_history
 config/zsh/.zcompdump*
 config/zsh/.zsh_sessions
+
+# Zed
+config/zed/prompts/
+config/zed/logs/
+config/zed/*.log
+config/zed/.session/
