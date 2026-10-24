@@ -1,49 +1,25 @@
-export ZPLUGDIR=$HOME/.local/share/zsh
-[[ -d "$ZPLUGDIR" ]] && mkdir -p "$ZPLUGDIR"
-
-source "$ZDOTDIR/zsh_functions"
-source "$ZDOTDIR/zsh_plugins"
-
-typeset -U PATH path
-export PATH="$HOME/.local/bin:$PATH"
-
+source "${ZDOTDIR}/functions.zsh"
 
 setopt AUTO_CD
-setopt AUTO_PUSHD
-setopt PUSHD_IGNORE_DUPS
-setopt PUSHD_SILENT
-
-setopt INTERACTIVE_COMMENTS
 setopt EXTENDED_GLOB
+setopt INTERACTIVE_COMMENTS
 setopt CORRECT
 
-setopt APPEND_HISTORY
 setopt SHARE_HISTORY
-setopt HIST_EXTENDED_HISTORY
 setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_SPACE
 setopt HIST_FIND_NO_DUPS
+setopt HIST_IGNORE_SPACE
 setopt HIST_REDUCE_BLANKS
 
-zplug "zsh-users/zsh-completions"
-zplug "zsh-users/zsh-autosuggestions"
-zplug "zsh-users/zsh-history-substring-search"
-zplug "zsh-users/zsh-syntax-highlighting"
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^x^e' edit-command-line
 
-if [[ -d "$ZPLUGDIR/zsh-completions/src" ]]; then
-  fpath=(
-    $ZPLUGDIR/zsh-completions/src
-    $fpath
-  )
-fi
+_zplug "zsh-users/zsh-completions"
+_zplug "zsh-users/zsh-autosuggestions"
+_zplug "zsh-users/zsh-history-substring-search"
 
-if command -v docker &>/dev/null; then
-  local docker_completion="$ZDOTDIR/tabtab/_docker"
-  if [[ ! -f "$docker_completion" ]]; then
-    [[ ! -d "${docker_completion:h}" ]] && mkdir -p "${docker_completion:h}"
-    docker completion zsh > "$docker_completion"
-  fi
-fi
+zmodload zsh/complist
 
 zstyle ":completion:*" matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 zstyle ":completion:*:*:*:*:*" menu select
@@ -51,46 +27,55 @@ zstyle ":completion:*" use-cache yes
 zstyle ":completion:*" special-dirs true
 zstyle ":completion:*" squeeze-slashes true
 zstyle ":completion:*" file-sort change
-zstyle ":completion:*:warnings" format '%F{red}no matches found%f'
 
-zmodload zsh/complist
-
-autoload -U compinit
-if [[ -n "$HOME/.zcompdump"(#qN.mh+24) ]];then
-  compinit
-else
-  compinit -C
+fpath=("${ZDOTDIR}/tabtab" "${fpath[@]}")
+if [[ -d "${ZPLUGDIR}/zsh-completions/src" ]]; then
+  fpath=("${ZPLUGDIR}/zsh-completions/src" "${fpath[@]}")
 fi
 
-autoload -Uz edit-command-line
-zle -N edit-command-line
-bindkey '^x^e' edit-command-line
+_zcomp docker
+_zcomp mise
+_zcomp pnpm
+
+autoload -Uz compinit
+zmodload zsh/stat
+zmodload zsh/datetime
+
+_ZCOMPDUMP="${ZDOTDIR:-$HOME}/.zcompdump"
+
+if [[ ! -f "${_ZCOMPDUMP}" ]] ||
+  ((EPOCHSECONDS - $(zstat +mtime "${_ZCOMPDUMP}") >= 86400)); then
+  compinit -d "${_ZCOMPDUMP}"
+else
+  compinit -C -d "${_ZCOMPDUMP}"
+fi
+
+unset _ZCOMPDUMP
+
+source "${ZDOTDIR}/aliases.zsh"
+source "${ZDOTDIR}/keymaps.zsh"
 
 if command -v mise &>/dev/null; then
   eval "$(mise activate zsh)"
 fi
 
-if command -v pnpm &>/dev/null; then
-  export PNPM_HOME="$HOME/Library/pnpm"
-  prepend_path "$PNPM_HOME/bin"
-
-  local pnpm_completion="$ZDOTDIR/tabtab/_pnpm"
-  if [[ ! -f "$pnpm_completion" ]]; then
-    [[ ! -d "${pnpm_completion:h}" ]] && mkdir -p "${pnpm_completion:h}"
-    pnpm completion zsh > "$pnpm_completion"
-  fi
-
-  source "$pnpm_completion"
+if command -v fd >/dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+  export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"
+  export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
 fi
 
-if command -v fzf &>/dev/null; then
+if command -v fzf >/dev/null 2>&1; then
+  # shellcheck disable=SC1090
   source <(fzf --zsh)
 fi
 
 if command -v zoxide &>/dev/null; then
-  eval "$(zoxide init zsh)"
+  eval "$(zoxide init zsh --cmd cd --hook pwd)"
 fi
 
 if command -v starship &>/dev/null; then
   eval "$(starship init zsh)"
 fi
+
+_zplug "zsh-users/zsh-syntax-highlighting"
