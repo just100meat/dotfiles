@@ -15,8 +15,6 @@ go = "1.26.2"
 
 rust = "1.94.1"
 
-
-
 java = "21"
 maven = "latest"
 gradle = "latest"
