@@ -4,7 +4,7 @@ set -Eeuo pipefail
 
 REPO="https://github.com/just100meat/dotfiles.git"
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
-MISE_CONFIG="$DOTFILES_DIR/config/mise/config.toml"
+MISE_CONFIG="${DOTFILES_DIR}/config/mise/config.toml"
 
 usage() {
   cat <<'EOF'
@@ -54,14 +54,14 @@ git --version
 
 echo "Installing dotfiles"
 
-if [[ -d "$DOTFILES_DIR/.git" ]]; then
-  echo "$DOTFILES_DIR already exists"
-elif [[ -e "$DOTFILES_DIR" ]]; then
-  echo "Error: $DOTFILES_DIR exists but is not a Git repository" >&2
+if [[ -d "${DOTFILES_DIR}/.git" ]]; then
+  echo "${DOTFILES_DIR} already exists"
+elif [[ -e "${DOTFILES_DIR}" ]]; then
+  echo "Error: ${DOTFILES_DIR} exists but is not a Git repository" >&2
   exit 1
 else
-  mkdir -p "$(dirname "$DOTFILES_DIR")"
-  git clone "$REPO" "$DOTFILES_DIR"
+  mkdir -p "$(dirname "${DOTFILES_DIR}")"
+  git clone "${REPO}" "${DOTFILES_DIR}"
 fi
 
 echo "Installing mise"
@@ -70,7 +70,7 @@ if ! command -v mise >/dev/null 2>&1; then
   curl -fsSL https://mise.run | sh
 fi
 
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="${HOME}/.local/bin:$PATH"
 
 command -v mise >/dev/null 2>&1 || {
   echo "Error: mise is not available on PATH" >&2
@@ -79,20 +79,20 @@ command -v mise >/dev/null 2>&1 || {
 
 mise --version
 
-if [[ ! -f "$MISE_CONFIG" ]]; then
-  echo "Error: mise config not found: $MISE_CONFIG" >&2
+if [[ ! -f "${MISE_CONFIG}" ]]; then
+  echo "Error: mise config not found: ${MISE_CONFIG}" >&2
   exit 1
 fi
 
 echo "Bootstrapping machine"
 
-env MISE_GLOBAL_CONFIG_FILE="$MISE_CONFIG" \
+env MISE_GLOBAL_CONFIG_FILE="${MISE_CONFIG}" \
   mise bootstrap --yes --skip-dirty
 
 echo "Applying dotfiles"
 
-mise trust "$DOTFILES_DIR"
+mise trust "${DOTFILES_DIR}"
 
-mise -C "$DOTFILES_DIR" bootstrap dotfiles apply --yes
+mise -C "${DOTFILES_DIR}" bootstrap dotfiles apply --yes
 
 echo "Dotfiles installation complete"
