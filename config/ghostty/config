@@ -44,6 +44,8 @@ clipboard-paste-bracketed-safe = true
 
 confirm-close-surface = false
 notify-on-command-finish = unfocused
+scrollback-limit = 10000000
+link-url = true
 
 keybind = cmd+\=new_split:right
 keybind = cmd+shift+\=new_split:down
