@@ -2,6 +2,11 @@
 idiomatic_version_file_enable_tools = ["node"]
 
 [tools]
+node = "24"
+bun = "latest"
+deno = "latest"
+pnpm = "latest"
+
 python = "3.14"
 uv = "latest"
 ruff = "latest"
@@ -10,17 +15,17 @@ go = "1.26.2"
 
 rust = "1.94.1"
 
-node = "24"
-bun = "latest"
-deno = "latest"
-pnpm = "latest"
 
-lua = "latest"
-stylua = "latest"
 
 java = "21"
 maven = "latest"
 gradle = "latest"
+
+lua = "latest"
+stylua = "latest"
+
+shellcheck = "latest"
+shfmt = "latest"
 
 bat = "latest"
 cmake = "latest"
