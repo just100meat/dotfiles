@@ -3,7 +3,10 @@ window-theme = auto
 background-opacity = 0.80
 background-blur-radius = 30
 
-# macos-titlebar-style = hidden
+title = " "
+macos-titlebar-style = transparent
+macos-titlebar-proxy-icon = hidden
+
 window-width = 100
 window-height = 30
 window-decoration = true
