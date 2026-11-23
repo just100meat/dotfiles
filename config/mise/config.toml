@@ -80,3 +80,8 @@ run = """
   fi
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 """
+
+[tasks.setup-pnpm]
+description = "Setup pnpm global package directory"
+tools = { pnpm = "latest" }
+run = "pnpm setup --no-modify-path"
